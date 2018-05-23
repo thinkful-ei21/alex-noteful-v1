@@ -21,6 +21,9 @@ const app = express();
 // ADD STATIC SERVER HERE
 app.use(express.static("public"));
 
+// Parse request body
+app.use(express.json());
+
 app.use(requestLogger);
 
 app.get('/api/notes', (req, res, next) => {
@@ -42,6 +45,31 @@ app.get('/api/notes/:id', (req, res, next) => {
             return next(err); // goes to error handler
           }
           res.json(item); // responds with filtered item
+    });
+});
+
+app.put('/api/notes/:id', (req, res, next) => {
+    const id = req.params.id;
+  
+    /***** Never trust users - validate input *****/
+    const updateObj = {};
+    const updateFields = ['title', 'content'];
+  
+    updateFields.forEach(field => {
+      if (field in req.body) {
+        updateObj[field] = req.body[field];
+      }
+    });
+  
+    notes.update(id, updateObj, (err, item) => {
+      if (err) {
+        return next(err);
+      }
+      if (item) {
+        res.json(item);
+      } else {
+        next();
+      }
     });
 });
 
