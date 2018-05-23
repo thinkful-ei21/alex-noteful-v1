@@ -11,10 +11,14 @@ const data = require('./db/notes');
 
 const {PORT} = require('./config');
 
+const {requestLogger} = require('./middleware/logger');
+
 const app = express();
 
 // ADD STATIC SERVER HERE
 app.use(express.static("public"));
+
+app.use(requestLogger);
 
 app.get('/api/notes', (req, res) => {
     if(req.query.searchTerm){
