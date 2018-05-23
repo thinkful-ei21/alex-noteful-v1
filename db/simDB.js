@@ -46,6 +46,7 @@ const simDB = {
         let item = this.data.find(item => item.id === id);
         callback(null, item);
       } catch (err) {
+        console.log(err);
         callback(err);
       }
     }, DELAY);
