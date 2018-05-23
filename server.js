@@ -8,7 +8,7 @@
 const express = require('express');
 
 const data = require('./db/notes');
-
+const morgan = require('morgan');
 const simDB = require('./db/simDB');  // <<== add this
 const notes = simDB.initialize(data);
 
@@ -18,13 +18,12 @@ const {requestLogger} = require('./middleware/logger');
 
 const app = express();
 
+app.use(morgan('dev'));
 // ADD STATIC SERVER HERE
 app.use(express.static("public"));
 
 // Parse request body
 app.use(express.json());
-
-app.use(requestLogger);
 
 app.get('/api/notes', (req, res, next) => {
     const { searchTerm } = req.query;
