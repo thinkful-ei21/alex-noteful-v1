@@ -9,6 +9,9 @@ const express = require('express');
 
 const data = require('./db/notes');
 
+const simDB = require('./db/simDB');  // <<== add this
+const notes = simDB.initialize(data);
+
 const {PORT} = require('./config');
 
 const {requestLogger} = require('./middleware/logger');
@@ -20,19 +23,26 @@ app.use(express.static("public"));
 
 app.use(requestLogger);
 
-app.get('/api/notes', (req, res) => {
-    if(req.query.searchTerm){
-        const searchData = data.filter(function (item) {return item.title.includes(req.query.searchTerm)});
-        res.json(searchData);
-    }
-    else {
-    res.json(data);
-    }
+app.get('/api/notes', (req, res, next) => {
+    const { searchTerm } = req.query;
+  
+    notes.filter(searchTerm, (err, list) => {
+      if (err) {
+        return next(err); // goes to error handler
+      }
+      res.json(list); // responds with filtered array
+    });
 });
 
-app.get('/api/notes/:id', (req, res) => {
-    const dataItem = data.find(item=>item.id==req.params.id);
-    res.json(dataItem);
+app.get('/api/notes/:id', (req, res, next) => {
+    const { id } = req.params;
+
+    notes.find(id, (err, item) => {
+        if (err) {
+            return next(err); // goes to error handler
+          }
+          res.json(item); // responds with filtered item
+    });
 });
 
 app.use(function (req, res, next) {
