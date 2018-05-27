@@ -35,8 +35,23 @@ app.use(function (err, req, res, next) {
     });
 });
 
-app.listen(PORT, function () {
-  console.info(`Server listening on ${this.address().port}`);
-}).on('error', err => {
-  console.error(err);
-});
+app.startServer = function (port) {
+  return new Promise((resolve, reject) => {
+    this.listen(port, function () {
+      this.stopServer = require('util').promisify(this.close);
+      resolve(this);
+    }).on('error', reject);
+  });
+};
+
+if (require.main === module) {
+  app.startServer(PORT).catch(err => {
+    if (err.code === 'EADDRINUSE') {
+      const stars = '*'.repeat(80);
+      console.error(`${stars}\nEADDRINUSE (Error Address In Use). Please stop other web servers using port ${PORT}\n${stars}`);
+    }
+    console.error(err);
+  });
+}
+
+module.exports = app; // Export for testing
