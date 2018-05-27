@@ -14,7 +14,7 @@ const noteful = (function () {
   }
 
   /**
-   * GENERATE HTML FUNCTIONS
+   * G ENERATE HTML FUNCTIONS
    */
   function generateNotesList(list, currentNote) {
     const listItems = list.map(item => `
